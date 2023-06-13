@@ -1,47 +1,49 @@
 .global _start
 _start:
-	MOV R2, #1
-	LDR		R0, =0xFF200000 // LED location
+	LDR	R2, =0xFF200050 // Pushbutton location
+	LDR 	R2, [R2]       // Load the value of pushbutton to R2
 
-	CMP		R2, #1
-	BEQ		diff1
-	CMP		R2, #2
-	BEQ		diff2
-	CMP		R2, #3
-	BEQ		diff3
-	CMP		R2, #4
-	BEQ		diff4
-	CMP		R2, #5
-	BEQ		diff5
+	LDR	R0, =0xFF200000 // LED location
+
+	CMP	R2, #1
+	BEQ	diff1
+	CMP	R2, #2
+	BEQ	diff2
+	CMP	R2, #3
+	BEQ	diff3
+	CMP	R2, #4
+	BEQ	diff4
+	CMP	R2, #5
+	BEQ	diff5
 
 	//if none of the comparisons were true, end the program.
-	B		END
+	B	_start
 
 	diff1:
 	LDR 	R1, =0b11 		
-	STR		R1, [R0]		
+	STR	R1, [R0]		
 	BL LONG_DELAY			
-	B		END
+	B	END
 	diff2:
 	LDR 	R1, =0b1111
-	STR		R1, [R0]
+	STR	R1, [R0]
 	BL LONG_DELAY
-	B		END
+	B	END
 	diff3:
 	LDR 	R1, =0b111111
-	STR		R1, [R0]
+	STR	R1, [R0]
 	BL LONG_DELAY
-	B		END
+	B	END
 	diff4:
 	LDR 	R1, =0b11111111
-	STR		R1, [R0]
+	STR	R1, [R0]
 	BL LONG_DELAY
-	B		END
+	B	END
 	diff5:
 	LDR 	R1, =0b1111111111
-	STR		R1, [R0]
+	STR	R1, [R0]
 	BL LONG_DELAY 
-	B		END
+	B	END
 	
 SHORT_DELAY: 	
 	PUSH {R7} 
@@ -56,4 +58,3 @@ SUB_LOOP:
 	POP {R7}
 	BX LR
 END: B END
-	
