@@ -23,27 +23,27 @@ _start:
 	LDR 	R1, =0b11 		
 	STR	R1, [R0]		
 	BL LONG_DELAY			
-	B	END
+	B	_start
 	diff2:
 	LDR 	R1, =0b1111
 	STR	R1, [R0]
 	BL LONG_DELAY
-	B	END
+	B	_start
 	diff3:
 	LDR 	R1, =0b111111
 	STR	R1, [R0]
 	BL LONG_DELAY
-	B	END
+	B	_start
 	diff4:
 	LDR 	R1, =0b11111111
 	STR	R1, [R0]
 	BL LONG_DELAY
-	B	END
+	B	_start
 	diff5:
 	LDR 	R1, =0b1111111111
 	STR	R1, [R0]
 	BL LONG_DELAY 
-	B	END
+	B	_start
 	
 SHORT_DELAY: 	
 	PUSH {R7} 
