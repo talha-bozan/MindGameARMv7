@@ -1,0 +1,33 @@
+.global _start
+_start:
+	LDR		R0, =0xFF200000 // LED lokasyonu
+	LDR 	R1, =0b11 		//ilk 2 bt yaniyor
+	STR		R1, [R0]		// lede yolluyorum
+	BL LONG_DELAY			//delay, devami ayni
+	LDR 	R1, =0b1111
+	STR		R1, [R0]
+	BL LONG_DELAY
+	LDR 	R1, =0b111111
+	STR		R1, [R0]
+	BL LONG_DELAY
+	LDR 	R1, =0b11111111
+	STR		R1, [R0]
+	BL LONG_DELAY
+	LDR 	R1, =0b1111111111
+	STR		R1, [R0]
+	B END
+	
+SHORT_DELAY: 	
+	PUSH {R7} 
+	LDR R7, =900000 // delay counter
+	B SUB_LOOP
+LONG_DELAY: 	
+	PUSH {R7}
+	LDR R7, =2000000
+SUB_LOOP:
+	SUBS R7, R7, #1
+	BNE SUB_LOOP
+	POP {R7}
+	BX LR
+END: B END
+	
