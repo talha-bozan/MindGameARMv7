@@ -1,21 +1,47 @@
 .global _start
 _start:
-	LDR		R0, =0xFF200000 // LED lokasyonu
-	LDR 	R1, =0b11 		//ilk 2 bt yaniyor
-	STR		R1, [R0]		// lede yolluyorum
-	BL LONG_DELAY			//delay, devami ayni
+	MOV R2, #1
+	LDR		R0, =0xFF200000 // LED location
+
+	CMP		R2, #1
+	BEQ		diff1
+	CMP		R2, #2
+	BEQ		diff2
+	CMP		R2, #3
+	BEQ		diff3
+	CMP		R2, #4
+	BEQ		diff4
+	CMP		R2, #5
+	BEQ		diff5
+
+	//if none of the comparisons were true, end the program.
+	B		END
+
+	diff1:
+	LDR 	R1, =0b11 		
+	STR		R1, [R0]		
+	BL LONG_DELAY			
+	B		END
+	diff2:
 	LDR 	R1, =0b1111
 	STR		R1, [R0]
 	BL LONG_DELAY
+	B		END
+	diff3:
 	LDR 	R1, =0b111111
 	STR		R1, [R0]
 	BL LONG_DELAY
+	B		END
+	diff4:
 	LDR 	R1, =0b11111111
 	STR		R1, [R0]
 	BL LONG_DELAY
+	B		END
+	diff5:
 	LDR 	R1, =0b1111111111
 	STR		R1, [R0]
-	B END
+	BL LONG_DELAY 
+	B		END
 	
 SHORT_DELAY: 	
 	PUSH {R7} 
