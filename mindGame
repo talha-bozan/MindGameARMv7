@@ -71,6 +71,13 @@ VALID_INPUT:
 	CMP R9, R10
 	BEQ end
 	BNE SHOW_DIGITS
+	
+RESET:
+	BL LONG_DELAY
+	LDR R0, =0xFF200020
+	MOV R1, #0x00
+	STR R1, [R0]
+	B GAMELOOP
         
                       
 /* Configure the Altera interval timer to create interrupts at 50-msec intervals */
@@ -280,7 +287,7 @@ SHOW_DIGITS:
 		LDR		R5, =current
 		STR		R7, [R5]
 		STR		R6, [R0]			// Registeri displaya aktardim
-		B		GAMELOOP
+		B		RESET
 
 END_KEY_ISR:
 		POP {R0-R12, LR}
