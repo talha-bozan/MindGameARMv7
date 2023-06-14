@@ -52,7 +52,25 @@ BEQ MAINLOOP
 BNE SHOW_DIGITS
 
 GAMELOOP:
-B GAMELOOP
+	LDR R0, =0xff200040
+	LDR R2, =current
+	LDR R3, [R2]
+	WAIT_INPUT:
+	LDR R1, [R0]
+	CMP R1, R3
+	BEQ VALID_INPUT
+	BNE WAIT_INPUT
+	
+VALID_INPUT:
+	LDR R8, =0xff200000
+	LDR R9, [R8]
+	LSL R9, R9, #1
+	ORR R9, R9, #0b1
+	STR R9, [R8]
+	LDR R10, =0b1111111111
+	CMP R9, R10
+	BEQ end
+	BNE SHOW_DIGITS
         
                       
 /* Configure the Altera interval timer to create interrupts at 50-msec intervals */
@@ -73,7 +91,7 @@ CONFIG_KEYS:
         MOV     R1, #0xF                    // set interrupt mask bits
         STR     R1, [R0, #0x8]              // interrupt mask register is (base + 8)
         BX      LR                          
-		
+
 /* This file:
  * 1. defines exception vectors for the A9 processor
  * 2. provides code that initializes the generic interrupt controller
@@ -92,7 +110,7 @@ KEYS_CHECK:
         CMP     R5, #73           	//Push button interruptimi kontrol et
 		BNE UNEXPECTED				//Degilse unexpected interrupta git
 		BL CHECK_ROUND					//Oyleyse KEY_ISR'a git
-		B EXIT_IRQ					//Sonra interrupt cikisina git
+		B EXIT_IRQ					//Sonra interrupt cikisina git	
 UNEXPECTED:                             
         BNE     UNEXPECTED              // if not recognized, stop here
               
@@ -217,6 +235,7 @@ SHOW_DIGITS:
 		
 		LEVEL_0:
 		AND 	R5, R1, R4			// Maske ile aldigim 12 bitin ilk 3 bitini aldim R5'e
+		MOV		R7, R5
 		LSR 	R1, R1, #3			// kullandigim 3 biti kenara kaydirdim
 		LDRB	R2, [R3,R5]			// sayiyi registera yukledim hextable saysinda kenara kaydirarak
 		ADD		R6, R6, R2			// 
@@ -226,7 +245,9 @@ SHOW_DIGITS:
 		
 		LEVEL_1:
 		LSL		R6, R6, #8
+		LSL		R7, R7, #4
 		AND 	R5, R1, R4			// Maske ile aldigim 12 bitin ilk 3 bitini aldim R5'e
+		ORR		R7, R5, R7
 		LSR 	R1, R1, #3			// kullandigim 3 biti kenara kaydirdim
 		LDRB	R2, [R3,R5]			//sayiyi registera yukledim hextable saysinda kenara kaydirarak
 		ADD		R6, R6, R2			// 
@@ -236,7 +257,9 @@ SHOW_DIGITS:
 		
 		LEVEL_2:
 		LSL		R6, R6, #8
+		LSL		R7, R7, #4
 		AND 	R5, R1, R4			// Maske ile aldigim 12 bitin ilk 3 bitini aldim R5'e
+		ORR		R7, R5, R7
 		LSR 	R1, R1, #3			// kullandigim 3 biti kenara kaydirdim
 		LDRB	R2, [R3,R5]			//sayiyi registera yukledim hextable saysinda kenara kaydirarak
 		ADD		R6, R6, R2			// 
@@ -246,14 +269,16 @@ SHOW_DIGITS:
 		
 		LEVEL_3:
 		LSL		R6, R6, #8
+		LSL		R7, R7, #4
 		AND 	R5, R1, R4			// Maske ile aldigim 12 bitin ilk 3 bitini aldim R5'e
+		ORR		R7, R5, R7
 		LSR 	R1, R1, #3			// kullandigim 3 biti kenara kaydirdim
 		LDRB	R2, [R3,R5]			//sayiyi registera yukledim hextable saysinda kenara kaydirarak
 		ADD		R6, R6, R2			// 
 		
 		END_DISPLAY:
 		LDR		R5, =current
-		STR		R6, [R5]
+		STR		R7, [R5]
 		STR		R6, [R0]			// Registeri displaya aktardim
 		B		GAMELOOP
 
@@ -286,8 +311,11 @@ SUB_LOOP: SUBS R7, R7, #1
 	POP {R7}
 	BX LR
 
-
+end:
+	B end
+	
 HEXTABLE: .byte 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f
+
 
 .data
 .global round
@@ -296,9 +324,4 @@ round:    .word 0
 level:	  .word 0
 .global current
 current:  .word 0
-.global	input_value
-input_value: .word 0
-.global	input_count
-input_count: .word 0
 
-.end
